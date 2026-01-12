@@ -84,6 +84,8 @@
   - [--dolby-vision-rpu-prm \<param1\>=\<value1\>\[,\<param2\>=\<value2\>\]...](#--dolby-vision-rpu-prm-param1value1param2value2)
   - [--repeat-headers](#--repeat-headers)
   - [--no-repeat-headers](#--no-repeat-headers)
+  - [--aud](#--aud)
+  - [--no-aud](#--no-aud)
 - [IO / Audio / Subtitle Options](#io--audio--subtitle-options)
   - [--input-analyze \<float\>](#--input-analyze-float)
   - [--input-probesize \<int\>](#--input-probesize-int)
@@ -100,6 +102,7 @@
   - [--audio-codec \[\[\<int/string\>?\]\<string\>\[:\<string\>=\<string\>\[,\<string\>=\<string\>\]...\]...\]](#--audio-codec-intstringstringstringstringstringstring)
   - [--audio-encode-other-codec-only](#--audio-encode-other-codec-only)
   - [--audio-bitrate \[\<int/string\>?\]\<int\>](#--audio-bitrate-intstringint)
+  - [--audio-quality \[\<int/string\>?\]\<int\>](#--audio-quality-intstringint)
   - [--audio-profile \[\<int/string\>?\]\<string\>](#--audio-profile-intstringstring)
   - [--audio-stream \[\<int/string\>?\]{\<string1\>}\[:\<string2\>\]](#--audio-stream-intstringstring1string2)
   - [--audio-samplerate \[\<int/string\>?\]\<int\>](#--audio-samplerate-intstringint)
@@ -187,6 +190,7 @@
   - [--fallback-bitdepth](#--fallback-bitdepth)
   - [--avsdll \<string\>](#--avsdll-string)
   - [--disable-opencl](#--disable-opencl)
+  - [--task-perf-monitor](#--task-perf-monitor)
   - [--perf-monitor \[\<string\>\[,\<string\>\]...\]](#--perf-monitor-stringstring)
   - [--perf-monitor-interval \<int\>](#--perf-monitor-interval-int)
 
@@ -781,11 +785,25 @@ When used together with `--audio-codec`, if the input audio codec equals the cod
 ### --audio-bitrate [&lt;int/string&gt;?]&lt;int&gt;
 Specify the bitrate in kbps when encoding audio.
 
+You can select audio track (1, 2, ...) to encode with [&lt;int&gt;] before ```?```, or select audio track to encode by language with [&lt;string&gt;] before ```?```.
+
+You can set different bitrate to different audio channels, by using [&lt;string&gt;] after ```?```, using symbols below.
+
+```
+mono, stereo, 2.1, 3.0, 3.0(back), 3.1, 4.0, quad, quad(side), 5.0, 5.1, 6.0, 6.0(front), hexagonal, 6.1, 6.1(front), 7.0, 7.0(front), 7.1, 7.1(wide)
+```
+
+- Examples
+  ```
+  Example 1: --audio-bitrate 192 (set bitrate of audio track to 192 kbps)
+  Example 2: --audio-bitrate 1?320 --audio-bitrate 2?256 (set bitrate of 1st audio track to to 320 kbps, 2nd audio track   to to 256 kbps)
+  Example 3: --audio-bitrate stereo:256,5.1:640 (stereoを256kbpsで、5.1chを640kbpsで変換)
+  ```
+
+### --audio-quality [&lt;int/string&gt;?]&lt;int&gt;
+Specify the quality when encoding audio. The value depends on the codec used.
+
 You can select audio track (1, 2, ...) to encode with [&lt;int&gt;], or select audio track to encode by language with [&lt;string&gt;].
-```
-Example 1: --audio-bitrate 192 (set bitrate of audio track to 192 kbps)
-Example 2: --audio-bitrate 2?256 (set bitrate of 2nd audio track to to 256 kbps)
-```
 
 ### --audio-profile [&lt;int/string&gt;?]&lt;string&gt;
 Specify audio codec profile when encoding audio.You can select audio track (1, 2, ...) to encode with [&lt;int&gt;], or select audio track to encode by language with [&lt;string&gt;].
