@@ -90,10 +90,11 @@ jobs:
             -v ${{ github.workspace }}:/work \
             -v ${{ steps.prep.outputs.output_dir }}:/output \
             --name build_pkg ${{ env.BASE_IMAGE_REPO }}:${{ env.DOCKER_IMAGE }}
-          docker exec build_pkg bash -lc "cd /work && ./configure --libav-static --extra-cxxflags='-I./AviSynthPlus/avs_core/include -I./vapoursynth/include' --enable-lto"
-          docker exec build_pkg bash -lc "cd /work && make -j${{ steps.prep.outputs.nproc }}"
-          docker exec build_pkg bash -lc "cd /work && ./rkmppenc --version"
-          docker exec build_pkg bash -lc "cd /work && ./check_options.py"
+          docker exec build_pkg bash -lc "cd /work && meson setup ./build . --buildtype=release -Db_lto=true -Dcpp_args=\"['-I./AviSynthPlus/avs_core/include','-I./vapoursynth/include']\""
+          docker exec build_pkg bash -lc "cd /work && meson compile -C ./build -j${{ steps.prep.outputs.nproc }}"
+          docker exec build_pkg bash -lc "cd /work && ./build/rkmppenc --version"
+          docker exec build_pkg bash -lc "cd /work && ./check_options.py -exe ./build/rkmppenc"
+          docker exec build_pkg bash -lc "cd /work && cp ./build/rkmppenc ./rkmppenc"
           docker exec build_pkg bash -lc "cd /work && ./build_${{ env.PKG_TYPE }}.sh"
           docker exec build_pkg bash -lc "cd /work && cp -v ./*.${{ env.PKG_TYPE }} /output/"
           PKGFILE=`ls ${{ steps.prep.outputs.output_dir }}/*.${{ env.PKG_TYPE }}`

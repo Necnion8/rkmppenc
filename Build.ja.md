@@ -8,6 +8,7 @@
 ### 0. ビルドに必要なもの
 
 - C++17 Compiler
+- meson + ninja-build
 - git
 - libraries
   - mpp
@@ -21,7 +22,7 @@
 - ビルドツールのインストール
 
   ```Shell
-  sudo apt install build-essential libtool git cmake
+  sudo apt install build-essential libtool git cmake meson ninja-build
   ```
 
 - rust + cargo-cのインストール (libdovi, libhdr10plusビルド用)
@@ -104,11 +105,11 @@ sudo apt install ffmpeg \
 ```Shell
 git clone https://github.com/rigaya/rkmppenc --recursive
 cd rkmppenc
-./configure
-make
+meson setup ./build --buildtype=release
+meson compile -C ./build
 ```
 
-```./rkmppenc --check-mppinfo```で動作可能なチェックします。
+```./build/rkmppenc --check-mppinfo```で動作可能なチェックします。
 下記はRK3588の例です。環境により違いはあるかもしれませんが、このような感じで表示されれば問題ありません。
 
 ```Shell

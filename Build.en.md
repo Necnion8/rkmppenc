@@ -8,6 +8,7 @@
 ### 0. Requirements
 
 - C++17 Compiler
+- meson + ninja-build
 - git
 - libraries
   - mpp
@@ -21,7 +22,7 @@
 - Install build tools
 
   ```Shell
-  sudo apt install build-essential libtool git cmake
+  sudo apt install build-essential libtool git cmake meson ninja-build
   ```
 
 - Install rust + cargo-c (for libdovi, libhdr10plus build)
@@ -103,11 +104,11 @@ sudo apt install ffmpeg \
 ```Shell
 git clone https://github.com/rigaya/rkmppenc --recursive
 cd rkmppenc
-./configure
-make
+meson setup ./build --buildtype=release
+meson compile -C ./build
 ```
 
-You can test using ```./rkmppenc --check-mppinfo```.
+You can test using ```./build/rkmppenc --check-mppinfo```.
 
 Below is example when it works fine at RK3588. (might differ depending on your environment)
 

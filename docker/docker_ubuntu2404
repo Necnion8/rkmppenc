@@ -15,6 +15,8 @@ RUN apt-get update \
       cmake \
       libtool \
       pkg-config \
+      meson \
+      ninja-build \
       libass9 \
       libass-dev \
       libvpx-dev \

@@ -1,0 +1,52 @@
+embed_script = files('embed_resource.sh')
+
+resource_specs = [
+  ['nnedi3_weights', '../resource/nnedi3_weights.bin', 'resource_nnedi3_weights_bin'],
+  ['perf_monitor', '../PerfMonitor/perf_monitor.pyw', 'PerfMonitor_perf_monitor_pyw'],
+  ['rgy_filter_colorspace_func', '../mppcore/rgy_filter_colorspace_func.h', 'mppcore_rgy_filter_colorspace_func_h'],
+  ['clrng_clh', '../clRNG/src/include/clRNG/clRNG.clh', 'clRNG_src_include_clRNG_clRNG_clh'],
+  ['clrng_mrg31k3p_clh', '../clRNG/src/include/clRNG/mrg31k3p.clh', 'clRNG_src_include_clRNG_mrg31k3p_clh'],
+  ['clrng_private_mrg31k3p_ch', '../clRNG/src/include/clRNG/private/mrg31k3p.c.h', 'clRNG_src_include_clRNG_private_mrg31k3p_c_h'],
+  ['rgy_filter_cl', '../mppcore/rgy_filter.cl', 'mppcore_rgy_filter_cl'],
+  ['rgy_filter_afs_analyze_cl', '../mppcore/rgy_filter_afs_analyze.cl', 'mppcore_rgy_filter_afs_analyze_cl'],
+  ['rgy_filter_afs_filter_cl', '../mppcore/rgy_filter_afs_filter.cl', 'mppcore_rgy_filter_afs_filter_cl'],
+  ['rgy_filter_afs_merge_cl', '../mppcore/rgy_filter_afs_merge.cl', 'mppcore_rgy_filter_afs_merge_cl'],
+  ['rgy_filter_afs_synthesize_cl', '../mppcore/rgy_filter_afs_synthesize.cl', 'mppcore_rgy_filter_afs_synthesize_cl'],
+  ['rgy_filter_convolution3d_cl', '../mppcore/rgy_filter_convolution3d.cl', 'mppcore_rgy_filter_convolution3d_cl'],
+  ['rgy_filter_curves_cl', '../mppcore/rgy_filter_curves.cl', 'mppcore_rgy_filter_curves_cl'],
+  ['rgy_filter_deband_cl', '../mppcore/rgy_filter_deband.cl', 'mppcore_rgy_filter_deband_cl'],
+  ['rgy_filter_deband_gen_rand_cl', '../mppcore/rgy_filter_deband_gen_rand.cl', 'mppcore_rgy_filter_deband_gen_rand_cl'],
+  ['rgy_filter_decimate_cl', '../mppcore/rgy_filter_decimate.cl', 'mppcore_rgy_filter_decimate_cl'],
+  ['rgy_filter_decomb_cl', '../mppcore/rgy_filter_decomb.cl', 'mppcore_rgy_filter_decomb_cl'],
+  ['rgy_filter_delogo_cl', '../mppcore/rgy_filter_delogo.cl', 'mppcore_rgy_filter_delogo_cl'],
+  ['rgy_filter_denoise_dct_cl', '../mppcore/rgy_filter_denoise_dct.cl', 'mppcore_rgy_filter_denoise_dct_cl'],
+  ['rgy_filter_denoise_fft3d_cl', '../mppcore/rgy_filter_denoise_fft3d.cl', 'mppcore_rgy_filter_denoise_fft3d_cl'],
+  ['rgy_filter_denoise_knn_cl', '../mppcore/rgy_filter_denoise_knn.cl', 'mppcore_rgy_filter_denoise_knn_cl'],
+  ['rgy_filter_denoise_nlmeans_cl', '../mppcore/rgy_filter_denoise_nlmeans.cl', 'mppcore_rgy_filter_denoise_nlmeans_cl'],
+  ['rgy_filter_denoise_pmd_cl', '../mppcore/rgy_filter_denoise_pmd.cl', 'mppcore_rgy_filter_denoise_pmd_cl'],
+  ['rgy_filter_edgelevel_cl', '../mppcore/rgy_filter_edgelevel.cl', 'mppcore_rgy_filter_edgelevel_cl'],
+  ['rgy_filter_mpdecimate_cl', '../mppcore/rgy_filter_mpdecimate.cl', 'mppcore_rgy_filter_mpdecimate_cl'],
+  ['rgy_filter_nnedi_common_cl', '../mppcore/rgy_filter_nnedi_common.cl', 'mppcore_rgy_filter_nnedi_common_cl'],
+  ['rgy_filter_nnedi_k0_cl', '../mppcore/rgy_filter_nnedi_k0.cl', 'mppcore_rgy_filter_nnedi_k0_cl'],
+  ['rgy_filter_nnedi_k1_cl', '../mppcore/rgy_filter_nnedi_k1.cl', 'mppcore_rgy_filter_nnedi_k1_cl'],
+  ['rgy_filter_overlay_cl', '../mppcore/rgy_filter_overlay.cl', 'mppcore_rgy_filter_overlay_cl'],
+  ['rgy_filter_pad_cl', '../mppcore/rgy_filter_pad.cl', 'mppcore_rgy_filter_pad_cl'],
+  ['rgy_filter_resize_cl', '../mppcore/rgy_filter_resize.cl', 'mppcore_rgy_filter_resize_cl'],
+  ['rgy_filter_ssim_cl', '../mppcore/rgy_filter_ssim.cl', 'mppcore_rgy_filter_ssim_cl'],
+  ['rgy_filter_smooth_cl', '../mppcore/rgy_filter_smooth.cl', 'mppcore_rgy_filter_smooth_cl'],
+  ['rgy_filter_subburn_cl', '../mppcore/rgy_filter_subburn.cl', 'mppcore_rgy_filter_subburn_cl'],
+  ['rgy_filter_transform_cl', '../mppcore/rgy_filter_transform.cl', 'mppcore_rgy_filter_transform_cl'],
+  ['rgy_filter_tweak_cl', '../mppcore/rgy_filter_tweak.cl', 'mppcore_rgy_filter_tweak_cl'],
+  ['rgy_filter_unsharp_cl', '../mppcore/rgy_filter_unsharp.cl', 'mppcore_rgy_filter_unsharp_cl'],
+  ['rgy_filter_warpsharp_cl', '../mppcore/rgy_filter_warpsharp.cl', 'mppcore_rgy_filter_warpsharp_cl'],
+  ['rgy_filter_yadif_cl', '../mppcore/rgy_filter_yadif.cl', 'mppcore_rgy_filter_yadif_cl'],
+]
+
+resource_objects = []
+foreach spec : resource_specs
+  resource_objects += custom_target('embed_' + spec[0],
+    input: spec[1],
+    output: spec[0] + '.o',
+    command: ['bash', embed_script, '@INPUT@', '@OUTPUT@', spec[2]],
+  )
+endforeach
