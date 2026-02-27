@@ -751,7 +751,7 @@ int parse_cmd(VCEParam *pParams, const char *cmda, bool ignore_parse_err) {
 
 #pragma warning (push)
 #pragma warning (disable: 4127)
-tstring gen_cmd(const MPPParam *pParams, bool save_disabled_prm) {
+tstring gen_cmd(const MPPParam *pParams, bool save_disabled_prm, RGYDisableGenCmdFlags disable_flags) {
     std::basic_stringstream<TCHAR> cmd;
     std::basic_stringstream<TCHAR> tmp;
     MPPParam encPrmDefault;
@@ -805,8 +805,8 @@ tstring gen_cmd(const MPPParam *pParams, bool save_disabled_prm) {
     }
 #define OPT_CHAR(str, opt) if ((pParams->opt) && _tcslen(pParams->opt)) cmd << _T(" ") << str << _T(" ") << (pParams->opt);
 #define OPT_STR(str, opt) if (pParams->opt.length() > 0) cmd << _T(" ") << str << _T(" ") << (pParams->opt.c_str());
-#define OPT_CHAR_PATH(str, opt) if ((pParams->opt) && _tcslen(pParams->opt)) cmd << _T(" ") << str << _T(" \"") << (pParams->opt) << _T("\"");
-#define OPT_STR_PATH(str, opt) if (pParams->opt.length() > 0) cmd << _T(" ") << str << _T(" \"") << (pParams->opt.c_str()) << _T("\"");
+#define OPT_CHAR_PATH(str, opt) if (!rgy_disable_gen_cmd(disable_flags, RGYDisableGenCmdFlags::FilePath) && (pParams->opt) && _tcslen(pParams->opt)) cmd << _T(" ") << str << _T(" \"") << (pParams->opt) << _T("\"");
+#define OPT_STR_PATH(str, opt) if (!rgy_disable_gen_cmd(disable_flags, RGYDisableGenCmdFlags::FilePath) && pParams->opt.length() > 0) cmd << _T(" ") << str << _T(" \"") << (pParams->opt.c_str()) << _T("\"");
 
 #define ADD_NUM(str, opt) if ((pParams->opt) != (encPrmDefault.opt)) tmp << _T(",") << (str) << _T("=") << (pParams->opt);
 #define ADD_FLOAT(str, opt, prec) if ((pParams->opt) != (encPrmDefault.opt)) tmp << _T(",") << (str) << _T("=") << std::setprecision(prec) << (pParams->opt);
@@ -817,7 +817,7 @@ tstring gen_cmd(const MPPParam *pParams, bool save_disabled_prm) {
 
     cmd << _T(" -c ") << get_chr_from_value(list_codec, pParams->codec);
 
-    cmd << gen_cmd(&pParams->input, &encPrmDefault.input, &pParams->inprm, &encPrmDefault.inprm, save_disabled_prm);
+    cmd << gen_cmd(&pParams->input, &encPrmDefault.input, &pParams->inprm, &encPrmDefault.inprm, save_disabled_prm, disable_flags);
     if (save_disabled_prm) {
         if (pParams->rateControl == MPP_ENC_RC_MODE_FIXQP) {
             cmd << _T(" --vbr ") << pParams->bitrate;
@@ -874,11 +874,13 @@ tstring gen_cmd(const MPPParam *pParams, bool save_disabled_prm) {
         cmd << _T(" --deblock ") << pParams->deblockAlpha << _T(":") << pParams->deblockBeta;
     }
 
-    cmd << gen_cmd(&pParams->common, &encPrmDefault.common, save_disabled_prm);
+    cmd << gen_cmd(&pParams->common, &encPrmDefault.common, save_disabled_prm, disable_flags);
 
-    cmd << gen_cmd(&pParams->ctrl, &encPrmDefault.ctrl, save_disabled_prm);
+    if (!rgy_disable_gen_cmd(disable_flags, RGYDisableGenCmdFlags::CtrlPrms)) {
+        cmd << gen_cmd(&pParams->ctrl, &encPrmDefault.ctrl, save_disabled_prm, disable_flags);
+    }
 
-    cmd << gen_cmd(&pParams->vpp, &encPrmDefault.vpp, save_disabled_prm);
+    cmd << gen_cmd(&pParams->vpp, &encPrmDefault.vpp, save_disabled_prm, disable_flags);
 
     OPT_LST(_T("--vpp-deinterlace"), deint, list_iep_deinterlace);
 

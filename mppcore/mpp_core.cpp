@@ -41,6 +41,7 @@
 #include "rgy_output.h"
 #include "rgy_output_avcodec.h"
 #include "mpp_core.h"
+#include "mpp_cmd.h"
 #include "mpp_util.h"
 #include "mpp_param.h"
 #include "rgy_filter.h"
@@ -659,10 +660,14 @@ RGY_ERR MPPCore::initOutput(MPPParam *inputParams) {
     );
 
     auto insertHeader = inputParams->aud ? INSERT_HEADER_AUD : INSERT_HEADER_NONE;
+    auto muxerCmdline = tstring();
+    if (inputParams->common.muxerAddCmd) {
+        muxerCmdline = trim(gen_cmd(inputParams, false, RGYDisableGenCmdFlags::FilePath | RGYDisableGenCmdFlags::CtrlPrms | RGYDisableGenCmdFlags::InputPrms));
+    }
     auto err = initWriters(m_pFileWriter, m_pFileWriterListAudio, m_pFileReader, m_AudioReaders,
         &inputParams->common, &inputParams->input, &inputParams->ctrl, outputVideoInfo,
         m_trimParam, m_outputTimebase, m_Chapters, m_hdrsei.get(), m_hdr10plus.get(), m_dovirpu.get(), m_encTimestamp.get(), false, false, false, 0, insertHeader,
-        m_poolPkt.get(), m_poolFrame.get(), m_pStatus, m_pPerfMonitor, m_pLog);
+        muxerCmdline, m_poolPkt.get(), m_poolFrame.get(), m_pStatus, m_pPerfMonitor, m_pLog);
     if (err != RGY_ERR_NONE) {
         PrintMes(RGY_LOG_ERROR, _T("failed to initialize file reader(s).\n"));
         return err;
