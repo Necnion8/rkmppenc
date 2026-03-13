@@ -64,12 +64,12 @@ if not cpp.has_header('clRNG/clRNG.h', args: ['-I' + source_root / 'clRNG/src/in
   error('clRNG headers not found (clRNG/clRNG.h)')
 endif
 
-libavutil_dep = dependency('libavutil', required: true)
-libavcodec_dep = dependency('libavcodec', required: true)
-libavformat_dep = dependency('libavformat', required: true)
-libavfilter_dep = dependency('libavfilter', required: true)
-libswresample_dep = dependency('libswresample', required: true)
-libavdevice_dep = dependency('libavdevice', required: false)
+libavutil_dep = dependency('libavutil', required: true, static: true)
+libavcodec_dep = dependency('libavcodec', required: true, static: true)
+libavformat_dep = dependency('libavformat', required: true, static: true)
+libavfilter_dep = dependency('libavfilter', required: true, static: true)
+libswresample_dep = dependency('libswresample', required: true, static: true)
+libavdevice_dep = dependency('libavdevice', required: false, static: true)
 
 ffmpeg_deps = [
   libavutil_dep,
@@ -134,6 +134,7 @@ libass_dep = dependency('libass', required: enable_libass)
 
 # libdovi / libhdr10plus: system優先、なければ同梱build (configure互換)
 cargo_prog = find_program('cargo', required: false)
+cargo_multiarch_libdir = 'lib/' + host_machine.cpu_family() + '-linux-gnu'
 if cargo_prog.found()
   cargo_home_dir = source_root / '.cargo_home'
   cargo_c_check = run_command(
@@ -179,8 +180,8 @@ if not libdovi_dep.found()
     error('Failed to build bundled libdovi (exit=' + libdovi_build_result.returncode().to_string() + ')\nstdout:\n' + libdovi_build_result.stdout().strip() + '\nstderr:\n' + libdovi_build_result.stderr().strip())
   endif
   libdovi_lib_dirs = []
-  if fs.is_file(libdovi_install_dir / 'lib/x86_64-linux-gnu/libdovi.a')
-    libdovi_lib_dirs += libdovi_install_dir / 'lib/x86_64-linux-gnu'
+  if fs.is_file(libdovi_install_dir / cargo_multiarch_libdir / 'libdovi.a')
+    libdovi_lib_dirs += libdovi_install_dir / cargo_multiarch_libdir
   elif fs.is_file(libdovi_install_dir / 'lib64/libdovi.a')
     libdovi_lib_dirs += libdovi_install_dir / 'lib64'
   elif fs.is_file(libdovi_install_dir / 'lib/libdovi.a')
@@ -221,8 +222,8 @@ if not libhdr10plus_dep.found()
     error('Failed to build bundled libhdr10plus-rs (exit=' + libhdr10plus_build_result.returncode().to_string() + ')\nstdout:\n' + libhdr10plus_build_result.stdout().strip() + '\nstderr:\n' + libhdr10plus_build_result.stderr().strip())
   endif
   libhdr10plus_lib_dirs = []
-  if fs.is_file(libhdr10plus_install_dir / 'lib/x86_64-linux-gnu/libhdr10plus-rs.a')
-    libhdr10plus_lib_dirs += libhdr10plus_install_dir / 'lib/x86_64-linux-gnu'
+  if fs.is_file(libhdr10plus_install_dir / cargo_multiarch_libdir / 'libhdr10plus-rs.a')
+    libhdr10plus_lib_dirs += libhdr10plus_install_dir / cargo_multiarch_libdir
   elif fs.is_file(libhdr10plus_install_dir / 'lib64/libhdr10plus-rs.a')
     libhdr10plus_lib_dirs += libhdr10plus_install_dir / 'lib64'
   elif fs.is_file(libhdr10plus_install_dir / 'lib/libhdr10plus-rs.a')

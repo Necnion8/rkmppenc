@@ -1,15 +1,36 @@
 FROM arm64v8/ubuntu:20.04
 
-ARG DEBIAN_FRONTEND=noninteractive \
-    LOCAL_USER_ID=1000 \
-    LOCAL_GROUP_ID=1000
+ARG DEBIAN_FRONTEND=noninteractive
+ARG FFMPEG_DLL_REPO=https://github.com/rigaya/build_scripts.git
+ARG FFMPEG_DLL_REF=master
+ARG BUILD_SCRIPTS_DIR=/opt/build_scripts
+ARG FFMPEG_PREFIX=/opt/build_scripts/ffmpeg_dll/build_ffmpeg_dll/arm64/build
 
 RUN apt-get update \
-    && apt-get install -y \
+    && apt-get install -y --no-install-recommends \
       sudo \
       wget \
       curl \
       git \
+      ca-certificates \
+      gnupg \
+      lsb-release \
+      autogen \
+      autoconf \
+      automake \
+      autopoint \
+      gettext \
+      make \
+      patch \
+      xz-utils \
+      p7zip-full \
+      unzip \
+      bzip2 \
+      python3 \
+      python3-pip \
+      gperf \
+      nasm \
+      yasm \
       opencl-headers \
       build-essential \
       cmake \
@@ -19,19 +40,12 @@ RUN apt-get update \
       ninja-build \
       libass9 \
       libass-dev \
-      libvpx-dev \
-      libmp3lame-dev \
-      libbluray-dev \
-      libopus-dev \
-      libsoxr-dev \
-      libspeex-dev \
-      libtwolame-dev \
-      libvorbis-dev \
-      libssl-dev \
-      libxml2-dev \
-      libasound2-dev \
       openssl \
       libssl-dev \
+    && python3 -m pip install --upgrade pip \
+    && python3 -m pip install --upgrade meson ninja \
+    && cmake --version \
+    && meson --version \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -49,37 +63,26 @@ RUN wget https://github.com/tsukumijima/librga-rockchip/releases/download/v2.2.0
     apt-get install -y ./librga-dev_2.2.0-1_arm64.deb && \
     rm librga-dev_2.2.0-1_arm64.deb
 
-RUN wget https://github.com/rigaya/FFmpeg/releases/download/6.0-06addfde934cde3096511277cdb4a4b0b4f46e53/libavutil-dev_6.0-1_arm64.deb && \
-    wget https://github.com/rigaya/FFmpeg/releases/download/6.0-06addfde934cde3096511277cdb4a4b0b4f46e53/libswresample-dev_6.0-1_arm64.deb && \
-    wget https://github.com/rigaya/FFmpeg/releases/download/6.0-06addfde934cde3096511277cdb4a4b0b4f46e53/libswscale-dev_6.0-1_arm64.deb && \
-    wget https://github.com/rigaya/FFmpeg/releases/download/6.0-06addfde934cde3096511277cdb4a4b0b4f46e53/libavcodec-dev_6.0-1_arm64.deb && \
-    wget https://github.com/rigaya/FFmpeg/releases/download/6.0-06addfde934cde3096511277cdb4a4b0b4f46e53/libavformat-dev_6.0-1_arm64.deb && \
-    wget https://github.com/rigaya/FFmpeg/releases/download/6.0-06addfde934cde3096511277cdb4a4b0b4f46e53/libavfilter-dev_6.0-1_arm64.deb && \
-    wget https://github.com/rigaya/FFmpeg/releases/download/6.0-06addfde934cde3096511277cdb4a4b0b4f46e53/libavdevice-dev_6.0-1_arm64.deb && \
-    apt-get install -y ./libavutil-dev_6.0-1_arm64.deb && \
-    apt-get install -y ./libswresample-dev_6.0-1_arm64.deb && \
-    apt-get install -y ./libavcodec-dev_6.0-1_arm64.deb && \
-    apt-get install -y ./libswscale-dev_6.0-1_arm64.deb && \
-    apt-get install -y ./libavformat-dev_6.0-1_arm64.deb && \
-    apt-get install -y ./libavfilter-dev_6.0-1_arm64.deb && \
-    apt-get install -y ./libavdevice-dev_6.0-1_arm64.deb && \
-    rm libavutil-dev_6.0-1_arm64.deb && \
-    rm libswresample-dev_6.0-1_arm64.deb && \
-    rm libavcodec-dev_6.0-1_arm64.deb && \
-    rm libswscale-dev_6.0-1_arm64.deb && \
-    rm libavformat-dev_6.0-1_arm64.deb && \
-    rm libavfilter-dev_6.0-1_arm64.deb && \
-    rm libavdevice-dev_6.0-1_arm64.deb
-
-
 ENV LD_LIBRARY_PATH=/usr/local/lib
-
 ENV CARGO_HOME=/usr/local/cargo
 ENV RUSTUP_HOME=/usr/local/rustup
 ENV PATH=/usr/local/cargo/bin:$PATH
 
-# Install Rust toolchain (system-wide) and cargo-c for building bundled Rust libs
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain stable --no-modify-path && \
     cargo --version && rustc --version && \
     cargo install cargo-c --version '0.10.18+cargo-0.92.0' --locked && \
     (cargo-cbuild --version 2>/dev/null || true)
+
+RUN git clone --depth 1 --branch ${FFMPEG_DLL_REF} ${FFMPEG_DLL_REPO} ${BUILD_SCRIPTS_DIR} \
+    && cd ${BUILD_SCRIPTS_DIR}/ffmpeg_dll \
+    && sed -i 's/\r$//' ./build_ffmpeg_dll.sh \
+    && export NUMBER_OF_PROCESSORS="$(nproc)" \
+    && bash ./build_ffmpeg_dll.sh --skip-src-archive --disable-pgo --v4l2-multiplanar \
+    && test -f "${FFMPEG_PREFIX}/lib/pkgconfig/libavutil.pc" \
+    && find "${BUILD_SCRIPTS_DIR}" -mindepth 1 -maxdepth 1 ! -path "${BUILD_SCRIPTS_DIR}/ffmpeg_dll" -exec rm -rf {} + \
+    && find "${BUILD_SCRIPTS_DIR}/ffmpeg_dll" -mindepth 1 -maxdepth 1 ! -path "${BUILD_SCRIPTS_DIR}/ffmpeg_dll/build_ffmpeg_dll" -exec rm -rf {} + \
+    && find "${BUILD_SCRIPTS_DIR}/ffmpeg_dll/build_ffmpeg_dll" -mindepth 1 -maxdepth 1 ! -path "${BUILD_SCRIPTS_DIR}/ffmpeg_dll/build_ffmpeg_dll/arm64" -exec rm -rf {} + \
+    && find "${BUILD_SCRIPTS_DIR}/ffmpeg_dll/build_ffmpeg_dll/arm64" -mindepth 1 -maxdepth 1 ! -path "${BUILD_SCRIPTS_DIR}/ffmpeg_dll/build_ffmpeg_dll/arm64/build" -exec rm -rf {} +
+
+ENV FFMPEG_PREFIX=${FFMPEG_PREFIX}
+WORKDIR /work

@@ -15,17 +15,11 @@ if [ -e /etc/lsb-release ]; then
     PACKAGE_OS_CODENAME=`cat /etc/lsb-release | grep DISTRIB_CODENAME | cut -f 2 --delim="="`
     PACKAGE_OS="_${PACKAGE_OS_ID}${PACKAGE_OS_VER}"
     if [ "${PACKAGE_OS_CODENAME}" = "focal" ]; then
-        PACKAGE_DEPENDS="libc6(>=2.29),libstdc++6(>=6)"
-        PACKAGE_DEPENDS="${PACKAGE_DEPENDS},libmp3lame0,libopus0,libsoxr0,libspeex1,libtwolame0,libvorbisenc2,libasound2"
-        PACKAGE_DEPENDS="${PACKAGE_DEPENDS},libass9,libvpx6,libbluray2,libssl1.1"
+        PACKAGE_DEPENDS="libc6(>=2.29),libgcc-s1,librockchip-mpp1,librga2"
     elif [ "${PACKAGE_OS_CODENAME}" = "jammy" ]; then
-        PACKAGE_DEPENDS="libc6(>=2.29),libstdc++6(>=6)"
-        PACKAGE_DEPENDS="${PACKAGE_DEPENDS},libmp3lame0,libopus0,libsoxr0,libspeex1,libtwolame0,libvorbisenc2,libasound2"
-        PACKAGE_DEPENDS="${PACKAGE_DEPENDS},libass9,libvpx7,libbluray2,libssl3"
+        PACKAGE_DEPENDS="libc6(>=2.29),libgcc-s1,librockchip-mpp1,librga2"
     elif [ "${PACKAGE_OS_CODENAME}" = "noble" ]; then
-        PACKAGE_DEPENDS="libc6(>=2.29),libstdc++6(>=6)"
-        PACKAGE_DEPENDS="${PACKAGE_DEPENDS},libmp3lame0,libopus0,libsoxr0,libspeex1,libtwolame0,libvorbisenc2,libasound2"
-        PACKAGE_DEPENDS="${PACKAGE_DEPENDS},libass9,libvpx9,libbluray2,libssl3"
+        PACKAGE_DEPENDS="libc6(>=2.29),libgcc-s1,librockchip-mpp1,librga2"
     else
         echo "${PACKAGE_OS_ID}${PACKAGE_OS_VER} ${PACKAGE_OS_CODENAME} not supported in this script!"
         exit 1
