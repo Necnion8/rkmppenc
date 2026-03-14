@@ -23,6 +23,7 @@ jobs:
       IMAGE_REPO: ghcr.io/${{ github.repository_owner }}/rkmppenc-build
       FFMPEG_DLL_REPO: https://github.com/rigaya/build_scripts.git
       FFMPEG_DLL_REF: master
+      FFMPEG_PREFIX: /opt/build_scripts/ffmpeg_dll/build_dll/arm64/build
 
     steps:
       - name: Checkout
@@ -52,5 +53,6 @@ jobs:
           build-args: |
             FFMPEG_DLL_REPO=${{ env.FFMPEG_DLL_REPO }}
             FFMPEG_DLL_REF=${{ env.FFMPEG_DLL_REF }}
+            FFMPEG_PREFIX=${{ env.FFMPEG_PREFIX }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

@@ -69,7 +69,7 @@ QSVEnc / NVEnc / VCEEnc / rkmppenc と共通化できる部分は共通ファイ
 
 - Linux
 
-  `./configure` → `make` する。
+  `meson setup ./build .` → `meson compile -C ./build` する。
 
 ## ドキュメント
 

@@ -82,4 +82,5 @@ RUN git clone --depth 1 --branch ${FFMPEG_DLL_REF} ${FFMPEG_DLL_REPO} ${BUILD_SC
     && find "${BUILD_SCRIPTS_DIR}/ffmpeg_dll/build_dll/arm64" -mindepth 1 -maxdepth 1 ! -path "${BUILD_SCRIPTS_DIR}/ffmpeg_dll/build_dll/arm64/build" -exec rm -rf {} +
 
 ENV FFMPEG_PREFIX=${FFMPEG_PREFIX}
+ENV PKG_CONFIG_PATH=${FFMPEG_PREFIX}/lib/pkgconfig
 WORKDIR /work
