@@ -25,7 +25,7 @@ jobs:
       DOCKER_IMAGE: ${{ matrix.dockerimg }}
       PKG_TYPE: ${{ matrix.pkgtype }}
       BASE_IMAGE_REPO: ghcr.io/${{ github.repository_owner }}/rkmppenc-build
-      FFMPEG_PREFIX: /opt/build_scripts/ffmpeg_dll/build_ffmpeg_dll/arm64/build
+      FFMPEG_PREFIX: /opt/build_scripts/ffmpeg_dll/build_dll/arm64/build
 
     name: Upload Release Asset
     runs-on: ubuntu-24.04-arm64
