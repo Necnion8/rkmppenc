@@ -1,4 +1,14 @@
 # rkmppenc Release Notes
+## 0.18
+
+- Fix issue where DTS-X could not be copied.
+- Add option to write encoder options to encoding_tools when muxing. ([--muxer-add-cmd](./rkmppenc_Options.en.md#--muxer-add-cmd))
+- Fix Vapoursynth reading on Linux.
+- Extend [--audio-bitrate](./rkmppenc_Options.en.md#--audio-bitrate-intstringint) option.
+- Add support for Vapoursynth API V4.
+- Add option to use audio copy when input audio codec matches the one specified by [--audio-codec](./rkmppenc_Options.en.md#--audio-codec-intstringstringstringstringstringstring), and only encode when different. ([--audio-encode-other-codec-only](./rkmppenc_Options.en.md#--audio-encode-other-codec-only))
+- Fix OpenCL-related compile error on some environments.
+
 ## 0.17
 
 - Fix error when encoding H.264 for RTMP/FLV output. (#10)
