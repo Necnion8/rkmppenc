@@ -463,7 +463,7 @@ public:
     virtual RGY_ERR getOutputFrameInfo(RGYFrameInfo& info) { info = RGYFrameInfo(); return RGY_ERR_NONE; }
     virtual std::vector<std::unique_ptr<PipelineTaskOutput>> getOutput(const bool sync) {
         std::vector<std::unique_ptr<PipelineTaskOutput>> output;
-        while ((int)m_outQeueue.size() > m_outMaxQueueSize) {
+        while ((int)m_outQeueue.size() > m_outMaxQueueSize + 4) {
             auto out = std::move(m_outQeueue.front());
             m_outQeueue.pop_front();
             if (sync) {
